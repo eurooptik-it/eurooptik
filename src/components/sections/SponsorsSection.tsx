@@ -69,15 +69,17 @@ export function SponsorsSection({ data }: Props) {
                 {data.map((sponsor) => (
                   <div
                     key={sponsor.id}
-                    className="flex items-center justify-center rounded-2xl border border-white/70 bg-white/80 px-3 py-2 shadow sm:min-w-[140px] sm:px-4 sm:py-3"
+                    className="flex min-h-[88px] items-center justify-center rounded-2xl border border-white/70 bg-white/80 px-3 py-3 shadow sm:min-h-[112px] sm:min-w-[180px] sm:px-5 sm:py-4"
                   >
-                    <Image
-                      src={sponsor.logoUrl}
-                      alt={sponsor.name}
-                      width={180}
-                      height={80}
-                      className="h-12 w-auto object-contain sm:h-16"
-                    />
+                    <div className="flex h-16 w-[150px] items-center justify-center sm:h-[88px] sm:w-[220px]">
+                      <Image
+                        src={sponsor.logoUrl}
+                        alt={sponsor.name}
+                        width={380}
+                        height={160}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -129,13 +131,15 @@ export function SponsorsSection({ data }: Props) {
                     className="fade-slide rounded-2xl border border-white/60 bg-white/95 p-5 text-sm text-slate-600 shadow"
                   >
                     <div className="mb-3 flex flex-col gap-2">
-                      <Image
-                        src={sponsor.logoUrl}
-                        alt={sponsor.name}
-                        width={80}
-                        height={40}
-                        className="h-10 w-auto object-contain"
-                      />
+                      <div className="flex h-14 w-[170px] items-center justify-start sm:h-16 sm:w-[200px]">
+                        <Image
+                          src={sponsor.logoUrl}
+                          alt={sponsor.name}
+                          width={280}
+                          height={120}
+                          className="h-full w-full object-contain"
+                        />
+                      </div>
                       <p className="text-base font-semibold text-slate-900">
                         {sponsor.name}
                       </p>
