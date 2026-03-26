@@ -79,7 +79,7 @@ export function BlogSection({ data }: Props) {
           </p>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-[1.2fr_1fr]">
+        <div className="grid items-stretch gap-5 md:grid-cols-[1.2fr_1fr]">
           <div className="space-y-3">
             {visibleArticles.map((article) => (
               <button
@@ -98,7 +98,7 @@ export function BlogSection({ data }: Props) {
                   {article.title}
                 </h3>
                 {article.doctors.length > 0 && (
-                  <p className="text-base text-slate-500">
+                  <p className="mt-2 text-base text-slate-500">
                     {article.doctors.join(", ")}
                   </p>
                 )}
@@ -114,7 +114,7 @@ export function BlogSection({ data }: Props) {
             )}
           </div>
 
-          <div className="card max-h-[480px] overflow-y-auto p-6 soft-scroll">
+          <div className="card h-full p-6">
             {activeArticle ? (
               <div className="space-y-4">
                 <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">
@@ -124,7 +124,7 @@ export function BlogSection({ data }: Props) {
                   {activeArticle.title}
                 </h3>
                 {activeArticle.doctors.length > 0 && (
-                  <p className="text-sm text-slate-500">
+                  <p className="mt-2 text-sm text-slate-500">
                     de {activeArticle.doctors.join(", ")}
                   </p>
                 )}

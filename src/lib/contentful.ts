@@ -482,22 +482,47 @@ export async function fetchSponsors(locale = "ro"): Promise<Sponsor[]> {
     order: ["sys.createdAt"],
   });
 
-  return res.items
+  const sponsors = res.items
     .map((item) => {
       const fields = item.fields as any;
       if (!fields.nume || !fields.logo?.fields?.file?.url) return null;
-      
-      const websiteUrlValue = fields.linkWebsite ?? null; 
+
+      const websiteUrlValue = fields.linkWebsite ?? null;
+      const indexValueRaw = fields.index ?? fields.Index ?? null;
+      const indexValue =
+        typeof indexValueRaw === "number"
+          ? indexValueRaw
+          : typeof indexValueRaw === "string" && indexValueRaw.trim()
+            ? Number(indexValueRaw)
+            : null;
 
       return {
         id: item.sys.id,
         name: fields.nume,
         description: fields.descriere || "",
         logoUrl: assetUrl(fields.logo),
-        websiteUrl: websiteUrlValue, 
-      } as Sponsor; 
+        websiteUrl: websiteUrlValue,
+        index: Number.isFinite(indexValue as number) ? indexValue : null,
+      } as Sponsor;
     })
-    .filter((s): s is Sponsor => s !== null); 
+    .filter((s): s is Sponsor => s !== null);
+
+  const hasIndex = sponsors.some((sponsor) => typeof sponsor.index === "number");
+
+  if (!hasIndex) {
+    return sponsors;
+  }
+
+  return [...sponsors].sort((a, b) => {
+    const aIndex = typeof a.index === "number" ? a.index : Number.POSITIVE_INFINITY;
+    const bIndex = typeof b.index === "number" ? b.index : Number.POSITIVE_INFINITY;
+
+    if (aIndex === bIndex) {
+      return a.name.localeCompare(b.name);
+    }
+
+    return aIndex - bIndex;
+  });
 }
 
 export async function getLandingData(locale = "ro"): Promise<LandingData> {

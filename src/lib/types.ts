@@ -119,6 +119,7 @@ export type Sponsor = {
   name: string;
   description: string;
   logoUrl: string;
+  index?: number | null;
   websiteUrl?: string | null;
 };
 

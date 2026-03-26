@@ -1,9 +1,50 @@
+"use client";
+
 import { clinicLocations } from "@/lib/locations";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
+
+type LocationReview = {
+  id: string;
+  rating: number | null;
+  reviews: number | null;
+};
 
 export function LocationsSection() {
+  const [reviews, setReviews] = useState<LocationReview[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadReviews = async () => {
+      try {
+        const response = await fetch("/api/google-reviews/locations", {
+          cache: "force-cache",
+        });
+        if (!response.ok) return;
+        const payload = (await response.json()) as LocationReview[];
+        if (!cancelled) {
+          setReviews(payload);
+        }
+      } catch {
+        // Keep UI stable when reviews cannot be fetched.
+      }
+    };
+
+    loadReviews();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const reviewsByLocationId = useMemo(
+    () => new Map(reviews.map((item) => [item.id, item])),
+    [reviews],
+  );
+
   return (
     <section id="locations">
       <div className="section-shell">
@@ -31,6 +72,22 @@ export function LocationsSection() {
               </div>
               <div className="space-y-2 px-5 py-5 text-base text-slate-600">
                 <p className="font-semibold text-slate-900">{location.address}</p>
+                {(() => {
+                  const locationReview = reviewsByLocationId.get(location.id);
+                  if (!locationReview?.rating || !locationReview.reviews) {
+                    return (
+                      <p className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-500">
+                        Recenzii indisponibile momentan
+                      </p>
+                    );
+                  }
+
+                  return (
+                    <p className="inline-flex rounded-full bg-[#fef2f8] px-3 py-1 text-sm font-semibold text-primary">
+                      {locationReview.rating.toFixed(1)} • {locationReview.reviews} recenzii
+                    </p>
+                  );
+                })()}
                 <p>{location.schedule}</p>
                 <p>
                   Telefon:{" "}

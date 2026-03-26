@@ -1,7 +1,7 @@
- "use client";
+"use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Sponsor } from "@/lib/types";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
@@ -11,17 +11,57 @@ type Props = {
 
 const CHUNK_SIZE = 4;
 
-export function SponsorsSection({ data }: Props) {
-  const groups = useMemo(() => {
-    const result: Sponsor[][] = [];
-    for (let i = 0; i < data.length; i += CHUNK_SIZE) {
-      result.push(data.slice(i, i + CHUNK_SIZE));
-    }
-    return result.length ? result : [data];
-  }, [data]);
+const hasManualSponsorOrder = (items: Sponsor[]) =>
+  items.some((item) => typeof item.index === "number");
 
+const sortSponsorsByIndex = (items: Sponsor[]) =>
+  [...items].sort((a, b) => {
+    const aIndex = typeof a.index === "number" ? a.index : Number.POSITIVE_INFINITY;
+    const bIndex = typeof b.index === "number" ? b.index : Number.POSITIVE_INFINITY;
+
+    if (aIndex === bIndex) {
+      return a.name.localeCompare(b.name);
+    }
+
+    return aIndex - bIndex;
+  });
+
+const shuffleSponsors = (items: Sponsor[]) => {
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+export function SponsorsSection({ data }: Props) {
+  const [displaySponsors, setDisplaySponsors] = useState<Sponsor[]>(() =>
+    hasManualSponsorOrder(data) ? sortSponsorsByIndex(data) : data,
+  );
   const [slide, setSlide] = useState(0);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  const useIndexedOrder = useMemo(() => hasManualSponsorOrder(data), [data]);
+  const indexedSponsors = useMemo(() => sortSponsorsByIndex(data), [data]);
+
+  useEffect(() => {
+    if (useIndexedOrder) {
+      setDisplaySponsors(indexedSponsors);
+    } else {
+      setDisplaySponsors(shuffleSponsors(data));
+    }
+    setSlide(0);
+  }, [data]);
+
+  const groups = useMemo(() => {
+    const result: Sponsor[][] = [];
+    for (let i = 0; i < displaySponsors.length; i += CHUNK_SIZE) {
+      result.push(displaySponsors.slice(i, i + CHUNK_SIZE));
+    }
+    return result.length ? result : [displaySponsors];
+  }, [displaySponsors]);
+
   const visiblePartners = groups[slide] ?? [];
 
   const toggleExpanded = (id: string) =>
@@ -46,7 +86,7 @@ export function SponsorsSection({ data }: Props) {
                 Rețea strategică
               </p>
               <p className="text-xl font-semibold text-slate-900 sm:text-3xl">
-                +{data.length} parteneri medicali și ONG-uri
+                +{displaySponsors.length} parteneri medicali și ONG-uri
               </p>
               <p className="text-base text-slate-600">
                 De la campanii de screeninguri oftalmologice până la proiecte
@@ -65,18 +105,18 @@ export function SponsorsSection({ data }: Props) {
                 </div>
               </div>
 
-              <div className="mt-6 grid grid-cols-2 gap-3 sm:flex sm:gap-4 sm:overflow-x-auto sm:pb-2 soft-scroll">
-                {data.map((sponsor) => (
+              <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                {displaySponsors.map((sponsor) => (
                   <div
                     key={sponsor.id}
-                    className="flex min-h-[88px] items-center justify-center rounded-2xl border border-white/70 bg-white/80 px-3 py-3 shadow sm:min-h-[112px] sm:min-w-[180px] sm:px-5 sm:py-4"
+                    className="flex min-h-[88px] items-center justify-center rounded-2xl border border-white/70 bg-white/80 p-3 shadow sm:min-h-[104px] sm:p-4"
                   >
-                    <div className="flex h-16 w-[150px] items-center justify-center sm:h-[88px] sm:w-[220px]">
+                    <div className="flex h-14 w-full items-center justify-center sm:h-16">
                       <Image
                         src={sponsor.logoUrl}
                         alt={sponsor.name}
-                        width={380}
-                        height={160}
+                        width={300}
+                        height={130}
                         className="h-full w-full object-contain"
                       />
                     </div>
@@ -101,6 +141,7 @@ export function SponsorsSection({ data }: Props) {
                         className={`h-2.5 w-2.5 rounded-full ${
                           slide === idx ? "bg-[#e4007f]" : "bg-[#ffd5ea]"
                         }`}
+                        aria-label={`Slide ${idx + 1}`}
                       />
                     ))}
                   </div>
