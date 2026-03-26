@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { getCachedLocationReviews } from "@/lib/googlePlacesReviews";
+import type { LocationReviewPayload } from "@/lib/googlePlacesReviews";
+
+type RatedLocationReview = LocationReviewPayload & {
+  rating: number;
+  reviews: number;
+};
 
 export async function GET() {
   try {
@@ -7,7 +13,7 @@ export async function GET() {
 
     const valid = payloads
       .filter(
-        (item): item is { name: string; rating: number; reviews: number } =>
+        (item): item is RatedLocationReview =>
           typeof item.rating === "number" && typeof item.reviews === "number"
       )
       .sort((a, b) =>
