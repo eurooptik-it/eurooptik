@@ -7,6 +7,7 @@ export type ClinicLocation = {
   schedule: string;
   image: string;
   mapUrl: string;
+  placeId?: string;
 };
 
 export const clinicLocations: ClinicLocation[] = [
@@ -19,6 +20,7 @@ export const clinicLocations: ClinicLocation[] = [
     schedule: "Luni - Vineri · 09:00 - 17:00",
     image: "/images/clinica_bacau.jpg",
     mapUrl: "https://g.co/kgs/CF3ZXSp",
+    placeId: "ChIJb2SJxiVwtUARCUeoB78IhLA",
   },
   {
     id: "bacau",
@@ -29,6 +31,7 @@ export const clinicLocations: ClinicLocation[] = [
     schedule: "Luni - Vineri · 09:00 - 17:00",
     image: "/images/cabinet_bacau.jpg",
     mapUrl: "https://g.co/kgs/kF5B3ia",
+    placeId: "ChIJydbC_iZwtUARDw-AMIBaDCQ",
   },
   {
     id: "moinesti",
@@ -39,6 +42,7 @@ export const clinicLocations: ClinicLocation[] = [
     schedule: "Luni - Vineri · 08:00 - 16:00",
     image: "/images/moinesti.jpeg",
     mapUrl: "https://g.co/kgs/5yqERUP",
+    placeId: "ChIJlbYX-V0-tUARiLdYFhyePng",
   },
   {
     id: "comanesti",
@@ -49,6 +53,7 @@ export const clinicLocations: ClinicLocation[] = [
     schedule: "Luni - Vineri · 09:00 - 17:00",
     image: "/images/locations/eurooptik_comanesti.png",
     mapUrl: "https://g.co/kgs/c5HFjzz",
+    placeId: "ChIJ2wki2AA9tUAR3dKWRWRwcVk",
   },
   {
     id: "onesti",
@@ -59,16 +64,18 @@ export const clinicLocations: ClinicLocation[] = [
     schedule: "Luni - Vineri · 09:00 - 17:00",
     image: "/images/onesti.jpg",
     mapUrl: "https://g.co/kgs/qbvbxa7",
+    placeId: "ChIJh6aTivAGtUAReCCBkS_RB0c",
   },
 ];
 
 export const footerLinks = [
   { label: "Acasă", href: "#hero" },
   { label: "Serviciile Noastre", href: "#services" },
-  { label: "Echipa Noastră", href: "#team" },
   { label: "Tarife", href: "#pricing" },
-  { label: "Testimoniale", href: "#testimonials" },
+  { label: "Echipa Noastră", href: "#team" },
+  { label: "Reels", href: "#reels" },
   { label: "Blog", href: "#blog" },
+  { label: "Testimoniale", href: "#testimonials" },
   { label: "Parteneri", href: "#sponsors" },
   { label: "Contact", href: "#locations" },
 ];

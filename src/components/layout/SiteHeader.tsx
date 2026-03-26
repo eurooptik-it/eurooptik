@@ -7,8 +7,9 @@ import { useState } from "react";
 const navigation = [
   { label: "Acasă", href: "#hero" },
   { label: "Servicii", href: "#services" },
-  { label: "Echipă", href: "#team" },
   { label: "Tarife", href: "#pricing" },
+  { label: "Echipă", href: "#team" },
+  { label: "Reels", href: "#reels" },
   { label: "Blog", href: "#blog" },
   { label: "Parteneri", href: "#sponsors" },
   { label: "Contact", href: "#locations" },

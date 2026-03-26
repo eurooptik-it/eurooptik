@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { getArticleBySlug, fetchArticles } from "@/lib/contentful";
+import { contentfulRichTextOptions } from "@/lib/contentfulRichTextOptions";
 
 type Params = Promise<{
   slug: string;
@@ -35,7 +36,7 @@ export default async function BlogArticlePage({ params }: { params: Params }) {
         )}
         <div className="space-y-4 text-base leading-relaxed text-slate-700">
           {article.content
-            ? documentToReactComponents(article.content)
+            ? documentToReactComponents(article.content, contentfulRichTextOptions)
             : "Conținut indisponibil."}
         </div>
       </div>

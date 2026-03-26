@@ -25,12 +25,12 @@ export default async function Home() {
       <main>
         <HeroSection />
         <SpecializationsSection data={data.specializations} />
+        <ServicesSection data={data.services} />
+        <PricingSection data={data.pricing} />
         <TeamSection data={data.team} />
         <ReelsSection data={data.reels} />
-        <PricingSection data={data.pricing} />
-        <ServicesSection data={data.services} />
-        <TestimonialsSection data={data.testimonials} />
         <BlogSection data={data.blog} />
+        <TestimonialsSection data={data.testimonials} />
         <ResearchSection data={data.research} />
         <LocationsSection />
         <SponsorsSection data={data.sponsors} />
