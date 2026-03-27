@@ -19,9 +19,17 @@ type PlacesResponse = {
 };
 
 const getRedisConfig = () => {
-    const url = process.env.STORAGE_KV_REST_API_URL;
-    const readToken = process.env.STORAGE_KV_REST_API_READ_ONLY_TOKEN;
-    const writeToken = process.env.STORAGE_KV_REST_API_TOKEN;
+    const url =
+        process.env.STORAGE_KV_REST_API_URL ??
+        process.env.KV_REST_API_URL ??
+        process.env.UPSTASH_REDIS_REST_URL;
+    const readToken =
+        process.env.STORAGE_KV_REST_API_READ_ONLY_TOKEN ??
+        process.env.KV_REST_API_READ_ONLY_TOKEN;
+    const writeToken =
+        process.env.STORAGE_KV_REST_API_TOKEN ??
+        process.env.KV_REST_API_TOKEN ??
+        process.env.UPSTASH_REDIS_REST_TOKEN;
 
     return {
         url,
