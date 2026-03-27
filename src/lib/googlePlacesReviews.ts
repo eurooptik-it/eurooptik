@@ -4,6 +4,7 @@ import { incrementMetric } from "@/lib/redisMetrics";
 const FIELDS = "rating,userRatingCount";
 const CACHE_SECONDS = 60 * 60 * 24 * 7;
 const CACHE_KEY = "google:places:location-reviews:v1";
+const STALE_CACHE_KEY = "google:places:location-reviews:stale:v1";
 const LOCATION_HIT_KEY = "metrics:googleReviews:locations:hit";
 const LOCATION_MISS_KEY = "metrics:googleReviews:locations:miss";
 const LOCATION_FRESH_KEY = "metrics:googleReviews:locations:fresh";
@@ -70,13 +71,33 @@ const readCachedReviews = async (): Promise<LocationReviewPayload[] | null> => {
     if (!token) return null;
 
     try {
-        const result = await runRedisCommand(["GET", CACHE_KEY], token);
-        if (!result || typeof result !== "string") return null;
+        const freshResult = await runRedisCommand(["GET", CACHE_KEY], token);
+        if (freshResult && typeof freshResult === "string") {
+            const parsedFresh = JSON.parse(freshResult) as LocationReviewPayload[];
+            if (Array.isArray(parsedFresh)) {
+                const config = getRedisConfig();
+                if (config.canWrite && config.writeToken) {
+                    try {
+                        await runRedisCommand(
+                            ["SET", STALE_CACHE_KEY, JSON.stringify(parsedFresh)],
+                            config.writeToken,
+                        );
+                    } catch {
+                        // Ignore promotion failures; read should still return fresh cache.
+                    }
+                }
 
-        const parsed = JSON.parse(result) as LocationReviewPayload[];
-        if (!Array.isArray(parsed)) return null;
+                return parsedFresh;
+            }
+        }
 
-        return parsed;
+        const staleResult = await runRedisCommand(["GET", STALE_CACHE_KEY], token);
+        if (!staleResult || typeof staleResult !== "string") return null;
+
+        const parsedStale = JSON.parse(staleResult) as LocationReviewPayload[];
+        if (!Array.isArray(parsedStale)) return null;
+
+        return parsedStale;
     } catch {
         return null;
     }
@@ -91,16 +112,23 @@ const writeCachedReviews = async (payload: LocationReviewPayload[]) => {
             ["SET", CACHE_KEY, JSON.stringify(payload), "EX", CACHE_SECONDS],
             config.writeToken,
         );
+
+        // Keep the latest successful payload as persistent fallback when API updates are disabled.
+        await runRedisCommand(
+            ["SET", STALE_CACHE_KEY, JSON.stringify(payload)],
+            config.writeToken,
+        );
     } catch {
         // Ignore Redis write failures; API should still return fresh data.
     }
 };
 
-const fetchLocationReviewsRaw = async (): Promise<LocationReviewPayload[]> => {
+const fetchLocationReviewsRaw = async (): Promise<LocationReviewPayload[] | null> => {
     const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+    const cacheOnlyMode = process.env.GOOGLE_PLACES_CACHE_ONLY === "true";
 
-    if (!apiKey) {
-        return emptyPayload();
+    if (!apiKey || cacheOnlyMode) {
+        return null;
     }
 
     try {
@@ -145,7 +173,7 @@ const fetchLocationReviewsRaw = async (): Promise<LocationReviewPayload[]> => {
         return payloads;
     } catch (error) {
         console.error("[google-reviews:shared]", error);
-        return emptyPayload();
+        return null;
     }
 };
 
@@ -158,6 +186,10 @@ export const getCachedLocationReviews = async (): Promise<LocationReviewPayload[
 
     await incrementMetric(LOCATION_MISS_KEY);
     const fresh = await fetchLocationReviewsRaw();
+    if (!fresh) {
+        return emptyPayload();
+    }
+
     await writeCachedReviews(fresh);
     await incrementMetric(LOCATION_FRESH_KEY);
     return fresh;
