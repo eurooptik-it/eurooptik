@@ -32,6 +32,34 @@ const socialLinks = [
   },
 ];
 
+const legalLinks = [
+  {
+    label: "Termeni și condiții",
+    href: "/termeni-si-conditii",
+  },
+  {
+    label: "Politica de confidențialitate",
+    href: "/politica-de-confidentialitate",
+  },
+];
+
+const anpcBadges = [
+  {
+    label: "ANPC - Soluționarea alternativă a litigiilor",
+    imageSrc: "/images/anpc/SAL.png",
+    imageWidth: 250,
+    imageHeight: 58,
+    href: "https://reclamatiisal.anpc.ro/",
+  },
+  {
+    label: "Soluționarea online a litigiilor",
+    imageSrc: "/images/anpc/SOL.png",
+    imageWidth: 250,
+    imageHeight: 58,
+    href: "https://consumer-redress.ec.europa.eu/site-relocation_en?event=main.home2.show&lng=RO",
+  },
+];
+
 export function SiteFooter() {
   return (
     <footer className="mt-16 border-t border-white/60">
@@ -102,6 +130,51 @@ export function SiteFooter() {
           height={120}
           className="mx-auto h-auto w-full max-w-[600px]"
         />
+      </div>
+
+      <div className="border-y border-slate-200/80 bg-white/85 px-[6rem] py-6 backdrop-blur-sm max-md:px-6">
+        <div className="mx-auto flex w-full max-w-[1200px] flex-wrap items-center justify-center gap-4 lg:flex-nowrap lg:justify-center lg:gap-3">
+          <div className="flex items-center justify-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm sm:px-6">
+            {legalLinks.map((link) => (
+              <Link
+                key={`strip-${link.href}`}
+                href={link.href}
+                className="whitespace-nowrap text-sm font-semibold text-slate-800 underline-offset-4 transition hover:text-primary hover:underline"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
+          <div className="hidden h-8 w-px bg-slate-300/80 lg:block" />
+
+          <div className="flex w-full flex-nowrap items-center justify-center gap-2 lg:w-auto lg:flex-nowrap">
+            {anpcBadges.map((badge) => (
+              <a
+                key={`strip-${badge.href}`}
+                href={badge.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-[60px] w-[46vw] min-w-[150px] max-w-[220px] items-center justify-center rounded-xl border border-[#d9d9e3] bg-white p-2 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md sm:h-[66px] sm:w-[210px]"
+                aria-label={badge.label}
+              >
+                <Image
+                  src={badge.imageSrc}
+                  alt={badge.label}
+                  width={badge.imageWidth}
+                  height={badge.imageHeight}
+                  className="h-[40px] w-auto max-w-[90%] object-contain sm:h-[46px] sm:max-w-[200px]"
+                />
+              </a>
+            ))}
+          </div>
+
+          <div className="hidden h-8 w-px bg-slate-300/80 lg:block" />
+
+          <p className="whitespace-nowrap rounded-full border border-slate-200 bg-white px-4 py-2 text-center text-[11px] leading-relaxed text-slate-500 shadow-sm">
+            SC Eurooptik SRL, CIF 8951958, J2015000609041
+          </p>
+        </div>
       </div>
     </footer>
   );

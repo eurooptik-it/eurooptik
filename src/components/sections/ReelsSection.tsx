@@ -116,7 +116,7 @@ export function ReelsSection({ data }: Props) {
             sau subiect.
           </p>
         ) : (
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {filteredReels.map((reel) => (
               <div
                 key={reel.id}

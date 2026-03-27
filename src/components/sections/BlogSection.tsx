@@ -15,11 +15,31 @@ export function BlogSection({ data }: Props) {
   const [activeSlug, setActiveSlug] = useState(data[0]?.slug ?? "");
   const [showAll, setShowAll] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const [leftColumnHeight, setLeftColumnHeight] = useState<number | null>(null);
   const [contentHeight, setContentHeight] = useState(0);
 
   const listColumnRef = useRef<HTMLDivElement | null>(null);
   const articleContentRef = useRef<HTMLDivElement | null>(null);
+  const articleCardRef = useRef<HTMLDivElement | null>(null);
+
+  const handleSelectArticle = (slug: string) => {
+    setActiveSlug(slug);
+
+    if (window.matchMedia("(max-width: 767px)").matches) {
+      requestAnimationFrame(() => {
+        const cardTop = articleCardRef.current?.getBoundingClientRect().top;
+        if (typeof cardTop !== "number") return;
+
+        const headerOffset = 92;
+        const targetY = window.scrollY + cardTop - headerOffset;
+        window.scrollTo({
+          top: Math.max(targetY, 0),
+          behavior: "smooth",
+        });
+      });
+    }
+  };
 
   const filteredArticles = useMemo(() => {
     if (!query) return data;
@@ -67,6 +87,15 @@ export function BlogSection({ data }: Props) {
   useEffect(() => {
     setIsExpanded(false);
   }, [activeSlug, query, showAll]);
+
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 768px)");
+    const update = () => setIsDesktop(media.matches);
+    update();
+    media.addEventListener("change", update);
+
+    return () => media.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     if (!listColumnRef.current) return;
@@ -125,11 +154,13 @@ export function BlogSection({ data }: Props) {
     return () => window.removeEventListener("open-article", handleOpenArticle as EventListener);
   }, []);
 
-  const collapsedHeight = leftColumnHeight ?? undefined;
-  const articleViewportHeight =
-    typeof collapsedHeight === "number" ? Math.max(collapsedHeight - 48, 180) : undefined;
-  const canExpand =
-    typeof articleViewportHeight === "number" && contentHeight > articleViewportHeight + 24;
+  const collapsedHeight = isDesktop ? leftColumnHeight ?? undefined : undefined;
+  const articleViewportHeight = isDesktop
+    ? typeof collapsedHeight === "number"
+      ? Math.max(collapsedHeight - 48, 180)
+      : 260
+    : 320;
+  const canExpand = contentHeight > articleViewportHeight + 24;
 
   return (
     <section id="blog">
@@ -140,7 +171,7 @@ export function BlogSection({ data }: Props) {
           description="Selectați categoria pentru a citi articolele medicale scrise de doctorii noștri pentru fiecare dintre specialitățile oferite de clinica noastră."
         />
 
-        <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto mb-6 flex w-full max-w-[44rem] flex-col gap-3 md:max-w-none md:flex-row md:items-center md:justify-between">
           <input
             type="search"
             placeholder="Caută după serviciu sau medic..."
@@ -153,26 +184,26 @@ export function BlogSection({ data }: Props) {
           </p>
         </div>
 
-        <div className="grid items-start gap-5 md:grid-cols-[1.2fr_1fr]">
-          <div ref={listColumnRef} className="space-y-3">
+        <div className="mx-auto grid w-full max-w-[44rem] items-start gap-5 md:max-w-none md:grid-cols-[1.2fr_1fr]">
+          <div ref={listColumnRef} className="mx-auto w-full min-w-0 max-w-[44rem] space-y-3 overflow-x-hidden md:max-w-none">
             {visibleArticles.map((article) => (
               <button
                 key={article.slug}
-                onClick={() => setActiveSlug(article.slug)}
-                className={`w-full rounded-2xl border px-4 py-4 text-left transition hover:border-primary ${
+                onClick={() => handleSelectArticle(article.slug)}
+                className={`mx-auto block min-w-0 w-full max-w-full overflow-hidden rounded-2xl border px-4 py-4 text-left whitespace-normal transition hover:border-primary ${
                   article.slug === activeSlug
                     ? "border-primary bg-primary/5"
                     : "border-slate-200 bg-white"
                 }`}
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
+                <p className="break-words [overflow-wrap:anywhere] [word-break:break-word] text-[11px] font-semibold uppercase tracking-[0.12em] text-primary sm:text-xs sm:tracking-[0.3em]">
                   {article.serviceName}
                 </p>
-                <h3 className="mt-2 text-lg font-semibold text-slate-900">
+                <h3 className="mt-2 break-words [overflow-wrap:anywhere] [word-break:break-word] text-base font-semibold text-slate-900 sm:text-lg">
                   {article.title}
                 </h3>
                 {article.doctors.length > 0 && (
-                  <p className="mt-2 text-base text-slate-500">
+                  <p className="mt-2 break-words [overflow-wrap:anywhere] [word-break:break-word] text-sm text-slate-500 sm:text-base">
                     {article.doctors.join(", ")}
                   </p>
                 )}
@@ -181,7 +212,7 @@ export function BlogSection({ data }: Props) {
             {filteredArticles.length > 4 && (
               <button
                 onClick={() => setShowAll((prev) => !prev)}
-                className="w-full rounded-full border border-[#ffd5ea] bg-white px-4 py-2 text-sm font-semibold text-[#e4007f] transition hover:border-[#f7a6cf]"
+                className="mx-auto block w-full rounded-full border border-[#ffd5ea] bg-white px-4 py-2 text-sm font-semibold text-[#e4007f] transition hover:border-[#f7a6cf]"
               >
                 {showAll ? "Ascunde articole" : "Vezi mai multe articole"}
               </button>
@@ -189,7 +220,8 @@ export function BlogSection({ data }: Props) {
           </div>
 
           <div
-            className="card flex flex-col p-6"
+            ref={articleCardRef}
+            className="card mx-auto flex w-full min-w-0 max-w-[44rem] flex-col p-6 md:max-w-none"
             style={!isExpanded && collapsedHeight ? { maxHeight: collapsedHeight } : undefined}
           >
             {activeArticle ? (
@@ -198,19 +230,19 @@ export function BlogSection({ data }: Props) {
                   className="relative overflow-hidden"
                   style={!isExpanded && articleViewportHeight ? { maxHeight: articleViewportHeight } : undefined}
                 >
-                  <div ref={articleContentRef} className="space-y-4">
-                    <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">
+                  <div ref={articleContentRef} className="min-w-0 space-y-4">
+                    <p className="break-words [overflow-wrap:anywhere] [word-break:break-word] text-sm font-semibold uppercase tracking-[0.16em] sm:tracking-[0.3em] text-primary">
                       {activeArticle.serviceName}
                     </p>
-                    <h3 className="text-2xl font-semibold text-slate-900">
+                    <h3 className="break-words [overflow-wrap:anywhere] [word-break:break-word] text-2xl font-semibold text-slate-900">
                       {activeArticle.title}
                     </h3>
                     {activeArticle.doctors.length > 0 && (
-                      <p className="mt-2 text-sm text-slate-500">
+                      <p className="mt-2 break-words [overflow-wrap:anywhere] [word-break:break-word] text-sm text-slate-500">
                         de {activeArticle.doctors.join(", ")}
                       </p>
                     )}
-                    <div className="space-y-3 text-base leading-relaxed text-slate-700">
+                    <div className="space-y-3 break-words text-base leading-relaxed text-slate-700 [&_a]:break-words [&_a]:underline-offset-4 [&_a]:hover:underline">
                       {activeArticle.content
                         ? documentToReactComponents(
                             activeArticle.content,
