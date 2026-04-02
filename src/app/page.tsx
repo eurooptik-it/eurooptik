@@ -28,9 +28,9 @@ export default async function Home() {
         <ServicesSection data={data.services} />
         <PricingSection data={data.pricing} />
         <TeamSection data={data.team} />
+        <TestimonialsSection data={data.testimonials} />
         <ReelsSection data={data.reels} />
         <BlogSection data={data.blog} />
-        <TestimonialsSection data={data.testimonials} />
         <ResearchSection data={data.research} />
         <LocationsSection />
         <SponsorsSection data={data.sponsors} />

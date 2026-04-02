@@ -73,10 +73,10 @@ export const footerLinks = [
   { label: "Serviciile Noastre", href: "#services" },
   { label: "Tarife", href: "#pricing" },
   { label: "Echipa Noastră", href: "#team" },
+  { label: "Testimoniale", href: "#testimonials" },
   { label: "Reels", href: "#reels" },
   { label: "Blog", href: "#blog" },
-  { label: "Testimoniale", href: "#testimonials" },
-  { label: "Parteneri", href: "#sponsors" },
   { label: "Contact", href: "#locations" },
+  { label: "Parteneri", href: "#sponsors" },
 ];
 

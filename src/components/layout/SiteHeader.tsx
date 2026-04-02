@@ -11,8 +11,8 @@ const navigation = [
   { label: "Echipă", href: "#team" },
   { label: "Reels", href: "#reels" },
   { label: "Blog", href: "#blog" },
-  { label: "Parteneri", href: "#sponsors" },
   { label: "Contact", href: "#locations" },
+  { label: "Parteneri", href: "#sponsors" },
 ];
 
 const socialLinks = [
