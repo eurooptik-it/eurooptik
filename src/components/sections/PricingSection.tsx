@@ -60,7 +60,7 @@ export function PricingSection({ data }: Props) {
           description="Selectați locația pentru a vedea prețurile consultațiilor disponibile în fiecare clinică."
         />
 
-        <div className="mb-8 flex flex-wrap gap-3">
+        {/* <div className="mb-8 flex flex-wrap gap-3">
           {clinicLocations.map((location) => (
             <button
               key={location.id}
@@ -74,6 +74,47 @@ export function PricingSection({ data }: Props) {
               {location.name}
             </button>
           ))}
+        </div> */}
+
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+          
+          {/* LEFT SIDE: Location Buttons */}
+          <div className="flex flex-wrap gap-3">
+            {clinicLocations.map((location) => (
+              <button
+                key={location.id}
+                onClick={() => setActiveLocation(location.id)}
+                className={`rounded-full border px-5 py-2 text-sm font-semibold transition ${
+                  activeLocation === location.id
+                    ? "border-primary bg-primary text-white"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-primary"
+                }`}
+              >
+                {location.name}
+              </button>
+            ))}
+          </div>
+
+          {/* RIGHT SIDE: TBI Bank Promotional Buttons */}
+          <div className="flex flex-wrap items-center gap-3">
+            
+            {/* Long Text Button (Black text on Orange background) */}
+            <a
+              href="#sponsors" 
+              className="rounded-full bg-[#ff7a00] border border-[#ff7a00] px-6 py-2 text-sm font-bold text-black transition hover:opacity-80"
+            >
+              Cumpără acum, plătește în 4 rate fără dobândă!
+            </a>
+
+            {/* Short Logo Button (White background for dark logo) */}
+            <a
+              href="#sponsors"
+              className="flex h-[38px] items-center justify-center rounded-full bg-white px-5 border border-slate-200 transition hover:bg-slate-50 hover:border-slate-300"
+            >
+              <img src="/images/tbi-bank.png" alt="TBI Bank Logo" className="h-6" />
+            </a>
+
+          </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
